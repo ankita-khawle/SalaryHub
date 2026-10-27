@@ -157,6 +157,19 @@ export default function App() {
       return;
     }
 
+
+    const confirmed = window.confirm(
+      `Confirm salary update for ${selectedEmployee.first_name} ${selectedEmployee.last_name}?\n\n` +
+        `Current salary: ${formatSalary(selectedEmployee.salary)}\n` +
+        `New salary: ${formatSalary(salaryInput.trim())}\n` +
+        `Effective date: ${effectiveDate}`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+
     setSavingSalary(true);
     setSalaryError("");
     setSalaryMessage("");
