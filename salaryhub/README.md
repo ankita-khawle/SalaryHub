@@ -11,30 +11,34 @@ ACME manages salary information for approximately 10,000 employees across multip
 ## Features
 
 ### Authentication and Security
+
 - HR Manager sign-in using email and password.
 - Protected API endpoints for employee, salary, salary history, and compensation data.
 - Secure password hashing and authenticated session handling.
 - Sign-out functionality.
 
-
 ### Employee Management
+
 - Browse and search employee records.
 - Filter employees using supported attributes, including department and employment status.
 - Navigate employee records using pagination.
 - View employee details and current salary information.
 
 ### Salary Management
+
 - Update employee salary information.
 - Validate salary inputs.
 - Record salary history, including previous and updated salary information, effective dates, and reasons where supported.
 - Review salary history from the employee profile.
 
 ### Compensation Insights
+
 - View compensation summaries by country and department.
 - Review employee counts and salary statistics.
 - Group compensation by currency to avoid directly comparing amounts in different currencies.
 
 ### Seed Data
+
 - Includes a seed script designed to populate the database with 10,000 synthetic employee records.
 - The seed process checks for existing employee data to avoid unnecessarily duplicating records.
 
@@ -43,14 +47,15 @@ ACME manages salary information for approximately 10,000 employees across multip
 | Layer | Technology |
 |---|---|
 | Frontend | React, TypeScript, Vite |
+| Frontend testing | Vitest, React Testing Library, `user-event` |
 | Backend | Python, FastAPI |
+| Backend testing | pytest, HTTPX |
 | Database | PostgreSQL |
 | ORM | SQLAlchemy |
 | Database migrations | Alembic |
-| Backend tests | pytest, HTTPX |
 | API documentation | FastAPI OpenAPI/Swagger |
 
-The frontend uses a component-based structure, with API calls separated from UI components where appropriate.
+The frontend uses a component-based structure, with API calls separated from UI components where appropriate. Automated tests cover key frontend interactions and backend behavior.
 
 ## Project Structure
 
@@ -69,6 +74,10 @@ The frontend uses a component-based structure, with API calls separated from UI 
 │       └── src/
 │           ├── api/
 │           ├── components/
+│           │   ├── DepartmentsDashboard.test.tsx
+│           │   ├── EmployeeDirectory.test.tsx
+│           │   ├── EmployeeProfileModal.test.tsx
+│           │   └── LoginPage.test.tsx
 │           └── ...
 ├── docs/
 │   └── requirements.md
@@ -97,7 +106,7 @@ From the project root:
 cd apps/api
 ```
 
-Activate the existing virtual environment or create one if needed:
+Create and activate a virtual environment if needed:
 
 ```bash
 python3 -m venv .venv
@@ -110,31 +119,36 @@ Install the backend dependencies using the repository's dependency file. For exa
 pip install -r requirements.txt
 ```
 
-Configure the database connection, then apply migrations using the migration configuration in the project:
+Configure the database connection and apply migrations:
 
 ```bash
 alembic upgrade head
 ```
 
-Run the seed script using the actual module or command provided by the repository. Check `app/seed.py` for its entry point and required configuration.
+Run the seed script using the actual entry point provided by the repository. Check `app/seed.py` for its command and configuration requirements.
 
-Start the API using the project's FastAPI application entry point. For example, if it is exposed as `app.main:app`:
+Start the API using the project's FastAPI application entry point. For example, if the application is exposed as `app.main:app`:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The API should be available at `http://127.0.0.1:8000` if using the default Uvicorn settings.
+The API should be available at `http://127.0.0.1:8000` with the default Uvicorn settings.
 
-FastAPI's interactive API documentation is typically available at `http://127.0.0.1:8000/docs`.
+Interactive API documentation is typically available at `http://127.0.0.1:8000/docs`.
 
 ### 3. Set up the frontend
 
-Open a second terminal:
+Open a second terminal from the project root:
 
 ```bash
 cd apps/web
 npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
@@ -144,28 +158,95 @@ Configure the frontend API base URL according to the project's environment confi
 
 ## Testing and Quality Checks
 
-### Backend tests
+Run the automated tests before submitting changes. The frontend and backend have separate test commands.
+
+### 1. Frontend component tests
+
+**Frameworks:** Vitest, React Testing Library, and `user-event`.
 
 From the project root:
+
+```bash
+cd apps/web
+npm test
+```
+
+This runs the frontend test suite using the `test` script configured in `apps/web/package.json`.
+
+To run tests in watch mode during development:
+
+```bash
+npm run test:watch
+```
+
+To run only the employee directory tests:
+
+```bash
+npx vitest run src/components/EmployeeDirectory.test.tsx
+```
+
+#### Frontend test file locations and coverage
+
+| Test file | Coverage |
+|---|---|
+| `apps/web/src/components/DepartmentsDashboard.test.tsx` | Dashboard rendering, loading and empty states, API errors, department data, and retry behavior |
+| `apps/web/src/components/EmployeeDirectory.test.tsx` | Employee information, search, department and status filters, pagination, empty states, and interactions |
+| `apps/web/src/components/EmployeeProfileModal.test.tsx` | Employee profile, salary updates, effective dates, validation, saving state, and salary history |
+| `apps/web/src/components/LoginPage.test.tsx` | Login form, required fields, successful login, errors, and loading state |
+
+These tests verify important component behavior without requiring manual interaction with every UI flow.
+
+### 2. Backend tests
+
+**Frameworks:** pytest and HTTPX.
+
+From the project root, run:
 
 ```bash
 apps/api/.venv/bin/python -m pytest apps/api/tests
 ```
 
-### Frontend production build
+This runs the backend test suite under `apps/api/tests`.
+
+Alternatively, if the backend virtual environment is already activated:
+
+```bash
+cd apps/api
+python -m pytest tests
+```
+
+The backend tests cover the implemented API endpoints and business logic, including the behavior exercised by the existing test suite.
+
+### 3. Frontend production build
+
+From the project root:
 
 ```bash
 cd apps/web
 npm run build
 ```
 
-### Frontend lint
+This verifies the frontend production build, including TypeScript and Vite build checks configured by the project.
+
+### 4. Frontend lint
+
+From `apps/web`:
 
 ```bash
 npm run lint
 ```
 
-The production build checks TypeScript compilation and generates the frontend build. Backend tests cover the implemented API and business logic. Run all checks before submitting changes.
+This runs the configured frontend lint checks.
+
+### Recommended pre-submission checklist
+
+- [ ] All React component tests pass.
+- [ ] All Python backend tests pass.
+- [ ] Frontend production build succeeds.
+- [ ] Frontend lint passes.
+- [ ] Database migrations apply successfully.
+- [ ] Seed data can be loaded into a clean database.
+- [ ] The README setup commands match the repository configuration.
 
 ## Requirements and Design Decisions
 
@@ -184,7 +265,7 @@ AI tools were used to support implementation and problem-solving. Generated sugg
 
 ## Assessment Scope
 
-This project is designed around the ACME employee salary management assessment. The initial scope focuses on employee records, salary management, salary history, and compensation insights for an organization with 10,000 employees.
+This project is designed around the ACME employee salary management assessment. The initial scope focuses on employee records, salary management, salary history, and compensation insights for an organization with approximately 10,000 employees.
 
 ## Deployment and Demo
 
