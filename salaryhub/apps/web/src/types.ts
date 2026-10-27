@@ -49,3 +49,29 @@ export interface SalaryUpdateResponse {
   effective_date: string;
   message: string;
 }
+
+
+export interface CountryCompensationSummary {
+  country: string;
+  currency: string;
+  employee_count: number;
+  average_salary: string | number;
+  min_salary: string | number;
+  max_salary: string | number;
+}
+
+export interface DepartmentCompensationSummary {
+  department_id: number;
+  department_name: string;
+  country: string;
+  currency: string;
+  employee_count: number;
+  average_salary: string | number;
+  min_salary: string | number;
+  max_salary: string | number;
+}
+
+export interface CompensationSummary {
+  by_country: CountryCompensationSummary[];
+  by_department: DepartmentCompensationSummary[];
+}

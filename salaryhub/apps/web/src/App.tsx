@@ -3,15 +3,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
   Building2,
-  ChevronLeft,
-  ChevronRight,
   CircleDollarSign,
-  Search,
   Users,
-  X,
-  CalendarDays,
-  Clock,
-  Save,
 } from "lucide-react";
 import {
   getDepartments,
@@ -20,8 +13,10 @@ import {
   updateEmployeeSalary,
 } from "./api/employees";
 import type { Department, Employee, EmployeeDetail } from "./types";
-
-
+import CompensationDashboard from "./components/CompensationDashboard";
+import EmployeeProfileModal from "./components/EmployeeProfileModal";
+import EmployeeDirectory from "./components/EmployeeDirectory";
+import DepartmentsDashboard from "./components/DepartmentsDashboard";
 import "./App.css";
 
 const PAGE_SIZE = 10;
@@ -52,7 +47,9 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [activeView, setActiveView] = useState<
+    "employees" | "departments" | "compensation"
+  >("employees");
 
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeDetail | null>(null);
@@ -117,7 +114,6 @@ export default function App() {
 
 
   async function openEmployee(employeeId: number) {
-    debugger
     setSelectedEmployee(null);
     setDetailLoading(true);
     setDetailError("");
@@ -136,7 +132,6 @@ export default function App() {
   }
 
   function closeEmployee() {
-    debugger
     setSelectedEmployee(null);
     setDetailError("");
     setSalaryMessage("");
@@ -225,18 +220,32 @@ export default function App() {
         </div>
 
         <div className="nav-label">WORKSPACE</div>
-        <div className="nav-item active">
+        <button
+          type="button"
+          className={`nav-item ${activeView === "employees" ? "active" : ""}`}
+          onClick={() => setActiveView("employees")}
+        >
           <Users size={18} />
           <span>Employees</span>
-        </div>
-        <div className="nav-item">
+        </button>
+
+        <button
+          type="button"
+          className={`nav-item ${activeView === "departments" ? "active" : ""}`}
+          onClick={() => setActiveView("departments")}
+        >
           <Building2 size={18} />
           <span>Departments</span>
-        </div>
-        <div className="nav-item">
+        </button>
+
+        <button
+          type="button"
+          className={`nav-item ${activeView === "compensation" ? "active" : ""}`}
+          onClick={() => setActiveView("compensation")}
+        >
           <CircleDollarSign size={18} />
           <span>Compensation</span>
-        </div>
+        </button>
 
         <div className="sidebar-footer">
           <div className="avatar">HR</div>
@@ -249,7 +258,14 @@ export default function App() {
 
       <main className="main-content">
         <header className="topbar">
-          <span>People / Employees</span>
+          <span>
+            People /{" "}
+            {activeView === "employees"
+              ? "Employees"
+              : activeView === "compensation"
+                ? "Compensation"
+                : "Departments"}
+          </span>
           <div className="topbar-right">
             <span className="status-dot" />
             <span>Connected to SalaryHub API</span>
@@ -257,369 +273,51 @@ export default function App() {
         </header>
 
         <section className="page-content">
-          <div className="page-heading">
-            <div>
-              <p className="eyebrow">PEOPLE MANAGEMENT</p>
-              <h1>Employees</h1>
-              <p className="subtitle">
-                Manage your workforce, departments, and compensation.
-              </p>
-            </div>
-            <div className="employee-total">
-              <Users size={17} />
-              <span>{total.toLocaleString("en-IN")} employees found</span>
-            </div>
-          </div>
 
-          <div className="stats-grid">
-            <article className="stat-card">
-              <div className="stat-icon blue"><Users size={20} /></div>
-              <div>
-                <p>Total employees</p>
-                <h2>{total.toLocaleString("en-IN")}</h2>
-                <span>Matching current filters</span>
-              </div>
-            </article>
-            <article className="stat-card">
-              <div className="stat-icon purple"><Building2 size={20} /></div>
-              <div>
-                <p>Departments</p>
-                <h2>{departments.length}</h2>
-                <span>Across the organization</span>
-              </div>
-            </article>
-            <article className="stat-card">
-              <div className="stat-icon green"><Users size={20} /></div>
-              <div>
-                <p>Active on this page</p>
-                <h2>{activeCount}</h2>
-                <span>Out of {employees.length} displayed</span>
-              </div>
-            </article>
-          </div>
-
-          <section className="employee-panel">
-            <div className="panel-heading">
-              <div>
-                <h2>Employee directory</h2>
-                <p>Search and filter employee records.</p>
-              </div>
-            </div>
-
-            <div className="filters">
-              <div className="search-box">
-                <Search size={18} />
-                <input
-                  aria-label="Search employees"
-                  placeholder="Search name, email or employee ID..."
-                  value={search}
-                  onChange={(event) => {
-                    setSearch(event.target.value);
-                    setPage(1);
-                  }}
-                />
-                {search && (
-                  <button
-                    className="clear-search"
-                    aria-label="Clear search"
-                    onClick={() => {
-                      setSearch("");
-                      setPage(1);
-                    }}
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-
-              <select
-                aria-label="Filter by department"
-                value={departmentId}
-                onChange={(event) => {
-                  setDepartmentId(event.target.value);
-                  setPage(1);
-                }}
-              >
-                <option value="">All departments</option>
-                {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                aria-label="Filter by employee status"
-                value={activeFilter}
-                onChange={(event) => {
-                  setActiveFilter(event.target.value);
-                  setPage(1);
-                }}
-              >
-                <option value="">All statuses</option>
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </select>
-
-              {(search || departmentId || activeFilter) && (
-                <button className="reset-button" onClick={resetFilters}>
-                  Reset
-                </button>
-              )}
-            </div>
-
-            {error && <div className="error-banner">{error}</div>}
-
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>EMPLOYEE</th>
-                    <th>ROLE</th>
-                    <th>DEPARTMENT</th>
-                    <th>COUNTRY</th>
-                    <th>ANNUAL SALARY</th>
-                    <th>STATUS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan={6} className="empty-state">Loading employees...</td>
-                    </tr>
-                  ) : employees.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="empty-state">
-                        No employees found. Try adjusting your filters.
-                      </td>
-                    </tr>
-                  ) : (
-                    employees.map((employee) => {
-                      const department = departments.find(
-                        (item) => item.id === employee.department_id,
-                      );
-
-                      return (
-                        <tr key={employee.id}>
-                          <td>
-                            <div className="employee-cell">
-                              <div className="employee-avatar">
-                                {employee.first_name.charAt(0)}
-                                {employee.last_name.charAt(0)}
-                              </div>
-                              <div>
-                                <button
-                                  type="button"
-                                  className="employee-open-button"
-                                  onClick={() =>{ 
-                                    console.log("Employee clicked:", employee.id);
-                                    return void openEmployee(employee.id)}}
-                                >
-                                  {employee.first_name} {employee.last_name}
-                                </button>
-                                <span>{employee.employee_code} · {employee.email}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>{employee.job_title}</td>
-                          <td>{department?.name ?? `Department ${employee.department_id}`}</td>
-                          <td>{employee.country}</td>
-                          <td className="salary-cell">
-                            {formatSalary(employee.salary, employee.currency)}
-                          </td>
-                          <td>
-                            <span className={`status-pill ${employee.is_active ? "active-status" : "inactive-status"}`}>
-                              <span />
-                              {employee.is_active ? "Active" : "Inactive"}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="pagination">
-              <span>
-                {total === 0
-                  ? "No results"
-                  : `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total.toLocaleString("en-IN")}`}
-              </span>
-              <div className="pagination-actions">
-                <button
-                  aria-label="Previous page"
-                  disabled={page <= 1 || loading}
-                  onClick={() => setPage((current) => current - 1)}
-                >
-                  <ChevronLeft size={17} />
-                </button>
-                <span>Page {page} of {totalPages}</span>
-                <button
-                  aria-label="Next page"
-                  disabled={page >= totalPages || loading}
-                  onClick={() => setPage((current) => current + 1)}
-                >
-                  <ChevronRight size={17} />
-                </button>
-              </div>
-            </div>
-          </section>
-
-
-          {(selectedEmployee || detailLoading || detailError) && (
-            <div className="modal-backdrop" onClick={closeEmployee}>
-              <section
-                className="employee-modal"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="employee-modal-title"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="modal-header">
-                  <div>
-                    <p className="eyebrow">EMPLOYEE PROFILE</p>
-                    <h2 id="employee-modal-title">
-                      {selectedEmployee
-                        ? `${selectedEmployee.first_name} ${selectedEmployee.last_name}`
-                        : "Employee details"}
-                    </h2>
-                  </div>
-                  <button
-                    type="button"
-                    className="modal-close"
-                    aria-label="Close employee profile"
-                    onClick={closeEmployee}
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-
-                {detailLoading ? (
-                  <p className="modal-feedback">Loading employee details...</p>
-                ) : detailError ? (
-                  <p className="modal-error">{detailError}</p>
-                ) : selectedEmployee ? (
-                  <>
-                    <div className="profile-summary">
-                      <div className="profile-avatar">
-                        {selectedEmployee.first_name.charAt(0)}
-                        {selectedEmployee.last_name.charAt(0)}
-                      </div>
-                      <div>
-                        <strong>{selectedEmployee.employee_code}</strong>
-                        <p>{selectedEmployee.email}</p>
-                        <p>{selectedEmployee.job_title}</p>
-                      </div>
-                    </div>
-
-                    <div className="profile-grid">
-                      <div>
-                        <span>Department</span>
-                        <strong>{selectedEmployee.department_name}</strong>
-                      </div>
-                      <div>
-                        <span>Current annual salary</span>
-                        <strong>{formatSalary(selectedEmployee.salary, selectedEmployee.currency)}</strong>
-                      </div>
-                      <div>
-                        <span>Hire date</span>
-                        <strong>{selectedEmployee.hire_date}</strong>
-                      </div>
-                      <div>
-                        <span>Status</span>
-                        <strong>{selectedEmployee.is_active ? "Active" : "Inactive"}</strong>
-                      </div>
-                    </div>
-
-                    <form className="salary-form" onSubmit={handleSalaryUpdate}>
-                      <h3>
-                        <CircleDollarSign size={18} />
-                        Update compensation
-                      </h3>
-
-                      <label htmlFor="new-salary">
-                        New annual salary ({selectedEmployee.currency})
-                      </label>
-                      <input
-                        id="new-salary"
-                        type="number"
-                        min="0.01"
-                        step="0.01"
-                        max="9999999999.99"
-                        required
-                        value={salaryInput}
-                        onChange={(event) => setSalaryInput(event.target.value)}
-                      />
-
-                      <label htmlFor="effective-date">
-                        <CalendarDays size={15} /> Effective date
-                      </label>
-                      <input
-                        id="effective-date"
-                        type="date"
-                        required
-                        value={effectiveDate}
-                        onChange={(event) => setEffectiveDate(event.target.value)}
-                      />
-
-                      {salaryError && (
-                        <p className="form-message error-message">{salaryError}</p>
-                      )}
-                      {salaryMessage && (
-                        <p className="form-message success-message">{salaryMessage}</p>
-                      )}
-
-                      <button
-                        type="submit"
-                        className="save-button"
-                        disabled={savingSalary}
-                      >
-                        <Save size={16} />
-                        {savingSalary ? "Saving..." : "Save salary update"}
-                      </button>
-                    </form>
-
-                    <div className="history-section">
-                      <h3>
-                        <Clock size={18} />
-                        Salary history
-                      </h3>
-
-                      {selectedEmployee.salary_history.length === 0 ? (
-                        <p className="history-empty">No salary history available.</p>
-                      ) : (
-                        <div className="history-list">
-                          {selectedEmployee.salary_history.map((item) => (
-                            <div className="history-item" key={item.id}>
-                              <div>
-                                <strong>
-                                  {formatSalary(item.new_salary, selectedEmployee.currency)}
-                                </strong>
-                                <p>
-                                  {item.previous_salary == null
-                                    ? "Initial salary"
-                                    : `${formatSalary(item.previous_salary, selectedEmployee.currency)} → ${formatSalary(item.new_salary, selectedEmployee.currency)}`}
-                                </p>
-                              </div>
-                              <div className="history-date">
-                                <span>{item.effective_date}</span>
-                                <small>
-                                  {new Date(item.changed_at).toLocaleDateString("en-IN")}
-                                </small>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : null}
-              </section>
-            </div>
+          {activeView === "employees" ? (
+            <EmployeeDirectory
+              employees={employees}
+              departments={departments}
+              total={total}
+              activeCount={activeCount}
+              loading={loading}
+              error={error}
+              search={search}
+              setSearch={setSearch}
+              departmentId={departmentId}
+              setDepartmentId={setDepartmentId}
+              activeFilter={activeFilter}
+              setActiveFilter={setActiveFilter}
+              resetFilters={resetFilters}
+              page={page}
+              setPage={setPage}
+              totalPages={totalPages}
+              openEmployee={openEmployee}
+              formatSalary={formatSalary}
+            />
+          ) : activeView === "compensation" ? (
+            <CompensationDashboard />
+          ) : (
+            <DepartmentsDashboard />
           )}
 
+
+
+          <EmployeeProfileModal
+            selectedEmployee={selectedEmployee}
+            detailLoading={detailLoading}
+            detailError={detailError}
+            closeEmployee={closeEmployee}
+            formatSalary={formatSalary}
+            handleSalaryUpdate={handleSalaryUpdate}
+            salaryInput={salaryInput}
+            setSalaryInput={setSalaryInput}
+            effectiveDate={effectiveDate}
+            setEffectiveDate={setEffectiveDate}
+            salaryError={salaryError}
+            salaryMessage={salaryMessage}
+            savingSalary={savingSalary}
+          />
 
           <footer className="page-footer">
             ACME SalaryHub · Employee and compensation management

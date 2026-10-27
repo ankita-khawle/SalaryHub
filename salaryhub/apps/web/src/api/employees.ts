@@ -1,6 +1,12 @@
 
 import { apiClient } from "./client";
-import type { Department, EmployeeListResponse, EmployeeDetail, SalaryUpdateResponse } from "../types";
+import type {
+  Department,
+  EmployeeListResponse,
+  EmployeeDetail,
+  SalaryUpdateResponse,
+  CompensationSummary,
+} from "../types";
 
 export interface EmployeeFilters {
   q?: string;
@@ -42,6 +48,15 @@ export async function updateEmployeeSalary(
       new_salary: newSalary,
       effective_date: effectiveDate,
     },
+  );
+
+  return response.data;
+}
+
+
+export async function getCompensationSummary() {
+  const response = await apiClient.get<CompensationSummary>(
+    "/compensation/summary",
   );
 
   return response.data;

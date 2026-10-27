@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.db.session import engine
 from app.api.routes.employees import router as employees_router
 from app.api.routes.departments import router as departments_router
+from app.api.routes.compensation import router as compensation_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -16,6 +17,7 @@ app = FastAPI(
 )
 app.include_router(employees_router)
 app.include_router(departments_router)
+app.include_router(compensation_router)
 
 app.add_middleware(
     CORSMiddleware,
