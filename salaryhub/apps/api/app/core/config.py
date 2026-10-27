@@ -14,6 +14,10 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    auth_secret_key: str = ""
+    auth_manager_email: str = ""
+    auth_manager_password_hash: str = ""
+    auth_token_expire_minutes: int = 30
 
     @property
     def allowed_origins(self) -> list[str]:

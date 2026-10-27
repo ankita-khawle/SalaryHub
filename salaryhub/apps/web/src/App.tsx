@@ -18,6 +18,8 @@ import EmployeeProfileModal from "./components/EmployeeProfileModal";
 import EmployeeDirectory from "./components/EmployeeDirectory";
 import DepartmentsDashboard from "./components/DepartmentsDashboard";
 import "./App.css";
+import { getCurrentUser, logout } from "./api/auth";
+import LoginPage from "./components/LoginPage";
 
 const PAGE_SIZE = 10;
 
@@ -63,14 +65,40 @@ export default function App() {
   const [salaryMessage, setSalaryMessage] = useState("");
   const [salaryError, setSalaryError] = useState("");
 
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    getDepartments()
-      .then(setDepartments)
-      .catch(() => setError("Unable to load departments. Check the API server."));
+    getCurrentUser()
+      .then((user) => setUserEmail(user.email))
+      .catch(() => setUserEmail(null))
+      .finally(() => setAuthLoading(false));
   }, []);
 
+  async function handleLogout() {
+    try {
+      await logout();
+      setUserEmail(null);
+      setSelectedEmployee(null);
+      setError("");
+    } catch {
+      setError("Unable to sign out. Please try again.");
+    }
+  }
+ useEffect(() => {
+  if (!userEmail) return;
+
+  getDepartments()
+    .then(setDepartments)
+    .catch(() => setError("Unable to load departments. Check the API server."));
+}, [userEmail]);
+
   useEffect(() => {
+    if (!userEmail) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
 
     setLoading(true);
@@ -100,7 +128,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [search, departmentId, activeFilter, page]);
+  }, [search, departmentId, activeFilter, page, userEmail]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const activeCount = employees.filter((employee) => employee.is_active).length;
@@ -208,6 +236,14 @@ export default function App() {
     }
   }
 
+  if (authLoading) {
+    return <div className="app-loading">Loading SalaryHub...</div>;
+  }
+
+  if (!userEmail) {
+    return <LoginPage onLogin={setUserEmail} />;
+  }
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -251,9 +287,16 @@ export default function App() {
           <div className="avatar">HR</div>
           <div>
             <strong>HR Manager</strong>
-            <span>ACME People Team</span>
+            <span>{userEmail}</span>
           </div>
         </div>
+        <button
+            type="button"
+            className="nav-item"
+            onClick={handleLogout}
+          >
+            Sign out
+          </button>
       </aside>
 
       <main className="main-content">

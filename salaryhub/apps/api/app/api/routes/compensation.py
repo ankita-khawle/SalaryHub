@@ -10,10 +10,11 @@ from app.schemas.compensation import (
     CountryCompensationSummary,
     DepartmentCompensationSummary,
 )
-
+from app.core.security import get_current_manager
 router = APIRouter(
     prefix="/api/compensation",
     tags=["Compensation"],
+    dependencies=[Depends(get_current_manager)]
 )
 
 

@@ -9,6 +9,7 @@ from app.db.session import engine
 from app.api.routes.employees import router as employees_router
 from app.api.routes.departments import router as departments_router
 from app.api.routes.compensation import router as compensation_router
+from app.api.routes.auth import router as auth_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -18,11 +19,13 @@ app = FastAPI(
 app.include_router(employees_router)
 app.include_router(departments_router)
 app.include_router(compensation_router)
+app.include_router(auth_router)
+
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE"],
     allow_headers=["Content-Type", "Authorization"],
 )

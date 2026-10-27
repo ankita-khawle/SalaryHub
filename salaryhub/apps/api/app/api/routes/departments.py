@@ -6,9 +6,12 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models import Department, Employee
 from app.schemas.department import DepartmentRead
-
-router = APIRouter(prefix="/api/departments", tags=["Departments"])
-
+from app.core.security import get_current_manager
+router = APIRouter(
+    prefix="/api/departments",
+    tags=["Departments"],
+    dependencies=[Depends(get_current_manager)],
+)
 
 @router.get("", response_model=list[DepartmentRead])
 def list_departments(db: Session = Depends(get_db)):

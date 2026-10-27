@@ -7,9 +7,12 @@ from app.models import SalaryHistory, Employee
 from app.schemas.salary import SalaryUpdateRequest, SalaryUpdateResponse
 from app.db.session import get_db
 from app.schemas.employee import EmployeeListResponse, EmployeeDetailRead
-
-router = APIRouter(prefix="/api/employees", tags=["Employees"])
-
+from app.core.security import get_current_manager
+router = APIRouter(
+    prefix="/api/employees",
+    tags=["Employees"],
+    dependencies=[Depends(get_current_manager)],
+)
 
 @router.get("", response_model=EmployeeListResponse)
 def list_employees(
