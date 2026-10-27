@@ -1,371 +1,199 @@
 # ACME SalaryHub
 
-**Employee Salary Management & Compensation Analytics**
+A web-based employee salary management application built for ACME's HR team. SalaryHub replaces spreadsheet-based workflows with a centralized interface for managing employee records, updating salaries, reviewing salary history, and understanding compensation across departments and countries.
 
-ACME SalaryHub is a web-based employee compensation management application designed to help HR managers manage employee salary data across multiple countries.
+## Problem Statement
 
-The application replaces spreadsheet-based workflows with a centralized platform for employee management, salary updates, compensation analytics, and auditable salary history.
+ACME manages salary information for approximately 10,000 employees across multiple countries using spreadsheets. SalaryHub aims to make these workflows easier, more reliable, and more accessible to HR through a web application backed by a relational database.
 
-The system is designed for an organization with approximately **10,000 employees**, emphasizing data integrity, maintainability, security, and efficient data access.
+**Primary user:** HR Manager.
 
 ## Features
 
+### Authentication and Security
+- HR Manager sign-in using email and password.
+- Protected API endpoints for employee, salary, salary history, and compensation data.
+- Secure password hashing and authenticated session handling.
+- Sign-out functionality.
+
+
 ### Employee Management
-- Search employees by name or employee ID.
-- Filter employees by country, department, job title, and employment status.
-- View employee details and current annual base salary.
-- Create and update employee records.
-- Support server-side pagination and sorting.
+- Browse and search employee records.
+- Filter employees using supported attributes, including department and employment status.
+- Navigate employee records using pagination.
+- View employee details and current salary information.
 
 ### Salary Management
-- Create and update employee salary records.
-- Validate salary amounts and currency codes.
-- Maintain salary change history, including previous and new amounts, effective dates, and reasons.
-- Keep salary updates and history records transactionally consistent.
+- Update employee salary information.
+- Validate salary inputs.
+- Record salary history, including previous and updated salary information, effective dates, and reasons where supported.
+- Review salary history from the employee profile.
 
-### Compensation Analytics
-- View employee and active employee counts.
-- Analyze compensation by department and country.
-- Calculate minimum, maximum, average, and median salaries.
-- Display salary statistics separately by currency to avoid misleading comparisons.
-- Export filtered employee and salary data to CSV.
+### Compensation Insights
+- View compensation summaries by country and department.
+- Review employee counts and salary statistics.
+- Group compensation by currency to avoid directly comparing amounts in different currencies.
 
-### Data Quality
-- Seed the database with 10,000 synthetic employee records.
-- Use version-controlled database migrations.
-- Validate API requests and enforce database constraints.
-- Include automated tests for core business workflows.
-- Provide API documentation and deployment instructions.
-
-> **Implementation status:** These features describe the intended scope. Update the README as features are implemented and verified.
+### Seed Data
+- Includes a seed script designed to populate the database with 10,000 synthetic employee records.
+- The seed process checks for existing employee data to avoid unnecessarily duplicating records.
 
 ## Technology Stack
 
 | Layer | Technology |
 |---|---|
 | Frontend | React, TypeScript, Vite |
-| UI Components | Material UI (MUI) |
 | Backend | Python, FastAPI |
-| ORM | SQLAlchemy 2.0 |
 | Database | PostgreSQL |
-| Request Validation | Pydantic |
-| Database Migrations | Alembic |
-| Backend Testing | pytest, HTTPX |
-| Frontend Testing | Vitest, React Testing Library |
-| Charts | Recharts |
-| API Documentation | OpenAPI / Swagger UI |
-| Deployment | Vercel and a managed API/database host |
+| ORM | SQLAlchemy |
+| Database migrations | Alembic |
+| Backend tests | pytest, HTTPX |
+| API documentation | FastAPI OpenAPI/Swagger |
 
-## Architecture
-
-The application follows a **modular monolith architecture**, with a Python REST API, a React frontend, and a relational database.
-
-```mermaid
-flowchart TD
-    HR[HR Manager] --> UI[React + TypeScript]
-    UI --> API[FastAPI REST API]
-    API --> VALID[Pydantic Validation]
-    VALID --> EMP[Employee Service]
-    VALID --> SAL[Salary Service]
-    VALID --> ANA[Analytics Service]
-    EMP --> ORM[SQLAlchemy]
-    SAL --> ORM
-    ANA --> ORM
-    ORM --> DB[(PostgreSQL)]
-    SAL --> HIST[Salary History]
-```
-
-### Key Engineering Decisions
-
-- **FastAPI:** Provides typed request and response contracts, input validation, and automatic API documentation.
-- **SQLAlchemy:** Provides explicit control over database queries and transactions.
-- **PostgreSQL:** Supports relational integrity, indexing, transactional updates, and database-side aggregation.
-- **Modular monolith:** Keeps deployment and operations simple without introducing unnecessary microservices.
-- **Server-side pagination:** Avoids loading all employee records into the browser.
-- **Currency-aware analytics:** Prevents incorrect aggregation of salaries denominated in different currencies.
-- **Deterministic seed data:** Makes testing and demonstrations reproducible.
-
-See [`docs/architecture.md`](docs/architecture.md) for detailed architecture and trade-offs.
+The frontend uses a component-based structure, with API calls separated from UI components where appropriate.
 
 ## Project Structure
 
 ```text
-salaryhub/
+.
 ├── apps/
 │   ├── api/
 │   │   ├── app/
-│   │   │   ├── api/
-│   │   │   │   └── routes/
-│   │   │   ├── core/
-│   │   │   ├── models/
+│   │   │   ├── api/routes/
 │   │   │   ├── schemas/
-│   │   │   ├── services/
-│   │   │   ├── repositories/
-│   │   │   ├── db/
-│   │   │   └── main.py
-│   │   ├── tests/
-│   │   ├── pyproject.toml
-│   │   └── .env.example
+│   │   │   └── ...
+│   │   ├── alembic/
+│   │   ├── scripts/
+│   │   └── tests/
 │   └── web/
-│       ├── src/
-│       │   ├── components/
-│       │   ├── features/
-│       │   │   ├── employees/
-│       │   │   ├── salaries/
-│       │   │   └── analytics/
-│       │   ├── api/
-│       │   └── pages/
-│       ├── package.json
-│       └── .env.example
+│       └── src/
+│           ├── api/
+│           ├── components/
+│           └── ...
 ├── docs/
-│   ├── requirements.md
-│   ├── architecture.md
-│   └── ai-usage.md
-├── .gitignore
+│   └── requirements.md
 └── README.md
 ```
 
-The structure may evolve as the implementation progresses.
-
-## Prerequisites
-
-Install the following:
-
-- Python 3.12 or later
-- Node.js LTS and npm
-- PostgreSQL
-- Git
-
 ## Getting Started
 
-### 1. Clone the Repository
+### Prerequisites
 
-```bash
-git clone <YOUR_REPOSITORY_URL>
-cd salaryhub
-```
+- Python version compatible with the backend dependencies.
+- Node.js and npm compatible with the frontend dependencies.
+- PostgreSQL.
 
-### 2. Configure the Backend
+### 1. Configure the database
 
-Navigate to the API directory:
+Create a PostgreSQL database for SalaryHub and configure the database connection using the environment variable names expected by the backend settings.
+
+Refer to the backend configuration files for the required environment variables. Do not commit credentials or secrets.
+
+### 2. Set up the backend
+
+From the project root:
 
 ```bash
 cd apps/api
 ```
 
-Create and activate a virtual environment.
-
-**macOS / Linux**
+Activate the existing virtual environment or create one if needed:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-**Windows PowerShell**
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-Install the backend dependencies:
+Install the backend dependencies using the repository's dependency file. For example, if the project uses `requirements.txt`:
 
 ```bash
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
-This assumes the project's `pyproject.toml` defines the application package and development dependencies.
-
-### 3. Configure Environment Variables
-
-Create an `.env` file based on the API's `.env.example`.
-
-Example:
-
-```dotenv
-DATABASE_URL=postgresql+psycopg://postgres:password@localhost:5432/salaryhub
-APP_ENV=development
-CORS_ORIGINS=http://localhost:5173
-```
-
-Use local development credentials and never commit secrets to version control.
-
-### 4. Run Database Migrations
-
-From `apps/api`:
+Configure the database connection, then apply migrations using the migration configuration in the project:
 
 ```bash
 alembic upgrade head
 ```
 
-This applies the version-controlled schema migrations to the configured database.
+Run the seed script using the actual module or command provided by the repository. Check `app/seed.py` for its entry point and required configuration.
 
-### 5. Seed the Database
-
-Run the documented seed command once it is implemented. For example:
+Start the API using the project's FastAPI application entry point. For example, if it is exposed as `app.main:app`:
 
 ```bash
-python -m app.db.seed
+uvicorn app.main:app --reload
 ```
 
-The seed script should generate 10,000 synthetic employees with valid employee identifiers and associated salary records.
+The API should be available at `http://127.0.0.1:8000` if using the default Uvicorn settings.
 
-The seed process should be deterministic and repeatable, without creating duplicate records on subsequent runs.
+FastAPI's interactive API documentation is typically available at `http://127.0.0.1:8000/docs`.
 
-### 6. Start the Backend
+### 3. Set up the frontend
 
-From `apps/api`:
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-Once configured, the local API should be available at:
-
-- API base URL: `http://localhost:8000`
-- Interactive API documentation: `http://localhost:8000/docs`
-- Alternative API documentation: `http://localhost:8000/redoc`
-
-### 7. Start the Frontend
-
-Open a separate terminal:
+Open a second terminal:
 
 ```bash
 cd apps/web
 npm install
-```
-
-Create the frontend `.env` file based on `.env.example`:
-
-```dotenv
-VITE_API_BASE_URL=http://localhost:8000
-```
-
-Start the React development server:
-
-```bash
 npm run dev
 ```
 
-The frontend should be available at `http://localhost:5173`.
+Open the local URL printed by Vite.
 
-*The setup commands above assume the corresponding package scripts, seed module, and configuration are present in the completed implementation.*
+Configure the frontend API base URL according to the project's environment configuration.
 
-## API Overview
+## Testing and Quality Checks
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health` | Application health check |
-| GET | `/api/employees` | List and filter employees |
-| POST | `/api/employees` | Create an employee |
-| GET | `/api/employees/{id}` | Retrieve employee details |
-| PATCH | `/api/employees/{id}` | Update employee information |
-| PATCH | `/api/employees/{id}/salary` | Update current salary |
-| GET | `/api/employees/{id}/salary-history` | Retrieve salary history |
-| GET | `/api/analytics/summary` | Compensation summary |
-| GET | `/api/analytics/by-department` | Department-level analytics |
-| GET | `/api/analytics/by-country` | Country-level analytics |
-| GET | `/api/employees/export` | Export filtered employee data |
+### Backend tests
 
-These endpoints describe the planned API contract. The final endpoint paths and request schemas should match the implemented FastAPI routes.
-
-## Testing
-
-The testing strategy focuses on business correctness, data integrity, and maintainability.
-
-### Backend
-
-The backend test suite should cover:
-
-- Employee creation and duplicate identifier validation.
-- Search, filtering, sorting, and pagination.
-- Salary validation and salary history.
-- Transaction rollback when an update fails.
-- Currency-aware compensation calculations.
-- Median calculations for odd and even populations.
-- CSV export and filter correctness.
-- Seed data uniqueness and repeatability.
-
-Run backend tests from `apps/api`:
+From the project root:
 
 ```bash
-pytest
+apps/api/.venv/bin/python -m pytest apps/api/tests
 ```
 
-### Frontend
-
-Frontend tests should cover:
-
-- Employee search and filters.
-- Form validation.
-- Salary editing workflows.
-- Loading, empty, and error states.
-- Correct rendering of analytics.
-
-Run frontend tests from `apps/web`:
+### Frontend production build
 
 ```bash
-npm test
+cd apps/web
+npm run build
 ```
 
-Use the actual scripts configured in `package.json`. Test results should be verified before marking the project complete.
+### Frontend lint
 
-## Security Considerations
+```bash
+npm run lint
+```
 
-Salary information is sensitive employee data. Before real-world use, the application must include:
+The production build checks TypeScript compilation and generates the frontend build. Backend tests cover the implemented API and business logic. Run all checks before submitting changes.
 
-- Authentication and appropriate authorization.
-- Server-side validation of all requests.
-- Access controls for salary updates and exports.
-- Secure secret management.
-- Restricted logging of sensitive employee information.
-- HTTPS in deployed environments.
-- Synthetic data for development and demonstration.
+## Requirements and Design Decisions
 
-An operational deployment should not be considered production-secure until its access controls and security configuration have been implemented and verified.
+Key decisions include:
+
+- **Authentication:** Protect sensitive HR data and restrict initial access to the HR Manager.
+- **Relational data model:** Maintain relationships between employees, departments, and salary history.
+- **Server-side pagination and filtering:** Avoid loading the full employee dataset into the browser.
+- **Salary history:** Maintain an audit trail of compensation changes.
+- **Currency-aware analytics:** Avoid misleading comparisons between different currencies.
+- **Focused scope:** Prioritize employee and salary management over payroll processing, tax calculations, recruitment, and complex enterprise identity features.
 
 ## AI-Assisted Development
 
-AI tools are used to support requirements analysis, architecture reviews, implementation, and code review.
+AI tools were used to support implementation and problem-solving. Generated suggestions and code were reviewed and validated through development checks and automated tests. Engineering decisions and final responsibility for correctness remain with the developer.
 
-AI-generated code is reviewed and validated rather than accepted without verification. Automated tests, type checks, and manual inspection are used to verify important behaviors.
+## Assessment Scope
 
-The AI development log records significant prompts, corrections, verification steps, and engineering decisions.
+This project is designed around the ACME employee salary management assessment. The initial scope focuses on employee records, salary management, salary history, and compensation insights for an organization with 10,000 employees.
 
-See [`docs/ai-usage.md`](docs/ai-usage.md).
+## Deployment and Demo
 
-## Trade-offs and Future Improvements
+- **Live application:** To be added after deployment and verification.
+- **Demo video:** To be added after recording.
+- **Repository:** This repository contains the application source code and supporting requirements documentation.
 
-The initial scope prioritizes employee management, salary updates, auditability, and compensation reporting.
+## Limitations
 
-Potential future enhancements include:
+SalaryHub is an assessment project, not a complete payroll or enterprise HR platform. Payroll execution, tax calculations, enterprise SSO, and complex role hierarchies are outside the initial scope.
 
-- Enterprise SSO and more granular permissions.
-- Salary approval workflows.
-- Bulk employee imports.
-- HRIS integrations.
-- Exchange-rate-aware global compensation comparisons.
-- Advanced audit retention and monitoring.
-
-These features are intentionally excluded from the initial release unless required by the assessment.
-
-## Deployment
-
-- **Live application:** To be added.
-- **API documentation:** To be added.
-- **Demo video:** To be added.
-
-Deployment instructions, environment configuration, and database migration procedures should be updated after the hosting environment has been configured and verified.
-
-## Assessment Artifacts
-
-- [Product Requirements](docs/requirements.md)
-- [Architecture and Design Decisions](docs/architecture.md)
-- [AI-Assisted Development Log](docs/ai-usage.md)
-
-The Git history captures the incremental development process and important implementation decisions.
-
-## License
-
-Created as a software engineering assessment and demonstration project.
+Before production use, the application would require a security review, deployment hardening, operational monitoring, backup and recovery procedures, and verification of authentication, authorization, and session-management controls.
