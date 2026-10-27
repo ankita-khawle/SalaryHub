@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy import func, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from datetime import date
 from decimal import Decimal
 from app.models import SalaryHistory, Employee
 from app.schemas.salary import SalaryUpdateRequest, SalaryUpdateResponse
 from app.db.session import get_db
-from app.schemas.employee import EmployeeListResponse
+from app.schemas.employee import EmployeeListResponse, EmployeeDetailRead
 
 router = APIRouter(prefix="/api/employees", tags=["Employees"])
 
@@ -105,3 +105,44 @@ def update_employee_salary(
         effective_date=payload.effective_date,
         message="Salary updated successfully",
     )
+
+
+
+@router.get("/{employee_id}", response_model=EmployeeDetailRead)
+def get_employee(
+    employee_id: int,
+    db: Session = Depends(get_db),
+):
+    statement = (
+        select(Employee)
+        .options(
+            selectinload(Employee.department),
+            selectinload(Employee.salary_history),
+        )
+        .where(Employee.id == employee_id)
+    )
+
+    employee = db.scalars(statement).first()
+
+    if employee is None:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found",
+        )
+
+    return {
+        "id": employee.id,
+        "employee_code": employee.employee_code,
+        "first_name": employee.first_name,
+        "last_name": employee.last_name,
+        "email": employee.email,
+        "job_title": employee.job_title,
+        "department_id": employee.department_id,
+        "department_name": employee.department.name,
+        "hire_date": employee.hire_date,
+        "salary": employee.salary,
+        "is_active": employee.is_active,
+        "salary_history": employee.salary_history,
+    }

@@ -7,12 +7,15 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.config import settings
 from app.db.session import engine
 from app.api.routes.employees import router as employees_router
+from app.api.routes.departments import router as departments_router
+
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     description="Employee and salary management API for ACME.",
 )
 app.include_router(employees_router)
+app.include_router(departments_router)
 
 app.add_middleware(
     CORSMiddleware,

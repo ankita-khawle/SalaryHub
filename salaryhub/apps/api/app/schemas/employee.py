@@ -1,6 +1,5 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
-
 from pydantic import BaseModel, ConfigDict
 
 
@@ -24,3 +23,19 @@ class EmployeeListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+
+class SalaryHistoryRead(BaseModel):
+    id: int
+    previous_salary: Decimal | None
+    new_salary: Decimal
+    effective_date: date
+    changed_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class EmployeeDetailRead(EmployeeRead):
+    department_name: str
+    salary_history: list[SalaryHistoryRead]
