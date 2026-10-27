@@ -8,19 +8,19 @@ from app.main import app
 
 
 @pytest.mark.unauthenticated
-def test_employee_endpoint_requires_authentication():
+def test_employee_endpoint_requires_authentication(test_auth_settings):
     response = TestClient(app).get("/api/employees")
     assert response.status_code == 401
 
 
 @pytest.mark.unauthenticated
-def test_compensation_endpoint_requires_authentication():
+def test_compensation_endpoint_requires_authentication(test_auth_settings):
     response = TestClient(app).get("/api/compensation/summary")
     assert response.status_code == 401
 
 
 @pytest.mark.unauthenticated
-def test_department_endpoint_requires_authentication():
+def test_department_endpoint_requires_authentication(test_auth_settings):
     response = TestClient(app).get("/api/departments")
     assert response.status_code == 401
 
@@ -65,7 +65,7 @@ def test_login_with_invalid_password(test_auth_settings):
 
 
 @pytest.mark.unauthenticated
-def test_current_manager_requires_valid_session():
+def test_current_manager_requires_valid_session(test_auth_settings):
     response = TestClient(app).get("/api/auth/me")
     assert response.status_code == 401
 

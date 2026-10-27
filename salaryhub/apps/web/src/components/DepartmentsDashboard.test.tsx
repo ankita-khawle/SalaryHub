@@ -11,9 +11,9 @@ vi.mock("../api/employees", () => ({
 }));
 
 const mockDepartments = [
-  { id: 1, name: "Engineering" },
-  { id: 2, name: "Human Resources" },
-  { id: 3, name: "Finance" },
+  { id: 1, name: "Engineering", employee_count: 5  },
+  { id: 2, name: "Human Resources", employee_count: 6  },
+  { id: 3, name: "Finance", employee_count: 3 },
 ];
 
 const mockedGetDepartments = vi.mocked(getDepartments);
