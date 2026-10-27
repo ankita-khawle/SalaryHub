@@ -21,6 +21,13 @@ DEPARTMENT_NAMES = [
     "Legal",
     "Data & Analytics",
 ]
+COUNTRY_SETTINGS = [
+    ("India", "INR", 400_000, 2_000_000),
+    ("United States", "USD", 60_000, 180_000),
+    ("United Kingdom", "GBP", 35_000, 100_000),
+    ("Canada", "CAD", 55_000, 150_000),
+    ("Australia", "AUD", 60_000, 160_000),
+]
 
 FIRST_NAMES = [
     "Aarav", "Aditi", "Ananya", "Arjun", "Diya",
@@ -83,9 +90,14 @@ def seed_database() -> None:
             hire_date = today - timedelta(
                 days=rng.randint(30, 3650)
             )
-            salary = Decimal(
-                rng.randrange(400_000, 2_000_001)
-            ) / Decimal("100")
+           country, currency, salary_min, salary_max = rng.choice(
+                COUNTRY_SETTINGS
+            )
+
+            salary = (
+                Decimal(rng.randrange(salary_min * 100, (salary_max + 1) * 100))
+                / Decimal("100")
+            )
 
             employees.append(
                 Employee(
@@ -97,6 +109,8 @@ def seed_database() -> None:
                     department_id=department.id,
                     hire_date=hire_date,
                     salary=salary,
+                    country=country,
+                    currency=currency,
                     is_active=rng.random() >= 0.05,
                 )
             )

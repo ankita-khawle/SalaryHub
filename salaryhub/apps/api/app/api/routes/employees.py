@@ -138,6 +138,8 @@ def get_employee(
         "first_name": employee.first_name,
         "last_name": employee.last_name,
         "email": employee.email,
+        "country": employee.country,
+        "currency": employee.currency,
         "job_title": employee.job_title,
         "department_id": employee.department_id,
         "department_name": employee.department.name,

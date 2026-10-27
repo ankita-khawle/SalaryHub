@@ -11,6 +11,8 @@ class EmployeeRead(BaseModel):
     first_name: str
     last_name: str
     email: str
+    country: str
+    currency: str
     job_title: str
     department_id: int
     hire_date: date

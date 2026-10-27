@@ -19,6 +19,12 @@ class Employee(Base):
     email: Mapped[str] = mapped_column(
         String(255), unique=True, index=True
     )
+    country: Mapped[str] = mapped_column(
+        String(100), nullable=False, default="India"
+    )
+    currency: Mapped[str] = mapped_column(
+        String(3), nullable=False, default="INR"
+    )
     job_title: Mapped[str] = mapped_column(String(150))
     department_id: Mapped[int] = mapped_column(
         ForeignKey("departments.id"), index=True

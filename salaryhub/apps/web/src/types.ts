@@ -5,6 +5,8 @@ export interface Employee {
   first_name: string;
   last_name: string;
   email: string;
+  country: string;
+  currency: string;
   job_title: string;
   department_id: number;
   hire_date: string;

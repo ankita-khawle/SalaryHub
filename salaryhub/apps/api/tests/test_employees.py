@@ -18,6 +18,8 @@ def make_employee(employee_id=1):
     employee.first_name = "Ananya"
     employee.last_name = "Sharma"
     employee.email = f"employee{employee_id}@example.com"
+    employee.country = "India"
+    employee.currency = "INR"
     employee.job_title = "Software Engineer"
     employee.department_id = 1
     employee.hire_date = date(2024, 1, 15)
@@ -91,6 +93,8 @@ def test_get_employee_returns_details_and_salary_history():
     employee.first_name = "Ananya"
     employee.last_name = "Sharma"
     employee.email = "employee00001@example.com"
+    employee.country = "India"
+    employee.currency = "INR"
     employee.job_title = "Software Engineer"
     employee.department_id = 1
     employee.department = department

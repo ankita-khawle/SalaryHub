@@ -26,10 +26,18 @@ import "./App.css";
 
 const PAGE_SIZE = 10;
 
-function formatSalary(salary: string) {
-  return new Intl.NumberFormat("en-IN", {
+function formatSalary(salary: string | number, currency: string) {
+  const localeByCurrency: Record<string, string> = {
+    INR: "en-IN",
+    USD: "en-US",
+    GBP: "en-GB",
+    CAD: "en-CA",
+    AUD: "en-AU",
+  };
+
+  return new Intl.NumberFormat(localeByCurrency[currency] ?? "en-US", {
     style: "currency",
-    currency: "INR",
+    currency,
     maximumFractionDigits: 0,
   }).format(Number(salary));
 }
@@ -160,8 +168,8 @@ export default function App() {
 
     const confirmed = window.confirm(
       `Confirm salary update for ${selectedEmployee.first_name} ${selectedEmployee.last_name}?\n\n` +
-        `Current salary: ${formatSalary(selectedEmployee.salary)}\n` +
-        `New salary: ${formatSalary(salaryInput.trim())}\n` +
+        `Current salary: ${formatSalary(selectedEmployee.salary, selectedEmployee.currency)}\n` +
+        `New salary: ${formatSalary(salaryInput.trim(), selectedEmployee.currency)}\n` +
         `Effective date: ${effectiveDate}`,
     );
 
@@ -369,6 +377,7 @@ export default function App() {
                     <th>EMPLOYEE</th>
                     <th>ROLE</th>
                     <th>DEPARTMENT</th>
+                    <th>COUNTRY</th>
                     <th>ANNUAL SALARY</th>
                     <th>STATUS</th>
                   </tr>
@@ -376,11 +385,11 @@ export default function App() {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="empty-state">Loading employees...</td>
+                      <td colSpan={6} className="empty-state">Loading employees...</td>
                     </tr>
                   ) : employees.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="empty-state">
+                      <td colSpan={6} className="empty-state">
                         No employees found. Try adjusting your filters.
                       </td>
                     </tr>
@@ -414,7 +423,10 @@ export default function App() {
                           </td>
                           <td>{employee.job_title}</td>
                           <td>{department?.name ?? `Department ${employee.department_id}`}</td>
-                          <td className="salary-cell">{formatSalary(employee.salary)}</td>
+                          <td>{employee.country}</td>
+                          <td className="salary-cell">
+                            {formatSalary(employee.salary, employee.currency)}
+                          </td>
                           <td>
                             <span className={`status-pill ${employee.is_active ? "active-status" : "inactive-status"}`}>
                               <span />
@@ -509,7 +521,7 @@ export default function App() {
                       </div>
                       <div>
                         <span>Current annual salary</span>
-                        <strong>{formatSalary(selectedEmployee.salary)}</strong>
+                        <strong>{formatSalary(selectedEmployee.salary, selectedEmployee.currency)}</strong>
                       </div>
                       <div>
                         <span>Hire date</span>
@@ -527,7 +539,9 @@ export default function App() {
                         Update compensation
                       </h3>
 
-                      <label htmlFor="new-salary">New annual salary (INR)</label>
+                      <label htmlFor="new-salary">
+                        New annual salary ({selectedEmployee.currency})
+                      </label>
                       <input
                         id="new-salary"
                         type="number"
@@ -580,11 +594,13 @@ export default function App() {
                           {selectedEmployee.salary_history.map((item) => (
                             <div className="history-item" key={item.id}>
                               <div>
-                                <strong>{formatSalary(item.new_salary)}</strong>
+                                <strong>
+                                  {formatSalary(item.new_salary, selectedEmployee.currency)}
+                                </strong>
                                 <p>
                                   {item.previous_salary == null
                                     ? "Initial salary"
-                                    : `${formatSalary(item.previous_salary)} → ${formatSalary(item.new_salary)}`}
+                                    : `${formatSalary(item.previous_salary, selectedEmployee.currency)} → ${formatSalary(item.new_salary, selectedEmployee.currency)}`}
                                 </p>
                               </div>
                               <div className="history-date">
