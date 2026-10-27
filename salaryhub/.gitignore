@@ -1,0 +1,49 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Frontend dependencies
+node_modules/
+
+# Frontend build outputs
+dist/
+build/
+.next/
+coverage/
+
+# Local environment and editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+
+# Local database backups
+*.dump
+*.sql.gz
+
+
+:cq
+:cq]
+cq;
